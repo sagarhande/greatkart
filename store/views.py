@@ -25,3 +25,14 @@ def store(request, category_slug=None):
         'products_count': products_count,
         }
     return render(request, 'store/store.html', context=context)
+
+
+def product_detail(request, category_slug, product_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    product = get_object_or_404(Product, slug=product_slug, category=category)
+
+    context = {
+         "product": product,
+        }
+
+    return render(request, 'store/product_details.html', context=context)
