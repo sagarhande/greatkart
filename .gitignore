@@ -3,3 +3,4 @@ env/
 documentation/
 db.sqlite3
 *.pyc
+*.jpg

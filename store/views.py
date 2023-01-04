@@ -9,9 +9,8 @@ from .models import Product
 
 
 def store(request, category_slug=None):
-    categories = Category.objects.all()
-    category = None
 
+    category = None
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
         products = Product.objects.filter(category=category, is_available=True)
@@ -22,7 +21,6 @@ def store(request, category_slug=None):
 
     context = {
         'category': category,
-        'categories': categories,
         'products': products,
         'products_count': products_count,
         }
