@@ -4,3 +4,5 @@ documentation/
 db.sqlite3
 *.pyc
 *.jpg
+media/
+images/
