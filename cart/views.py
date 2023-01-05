@@ -1,3 +1,10 @@
-from django.shortcuts import render
+# Standard library imports.
 
-# Create your views here.
+# Django imports.
+from django.shortcuts import render, HttpResponse
+
+# First party imports.
+
+
+def cart(request):
+    return render(request, "store/cart.html")
