@@ -80,6 +80,18 @@ def remove_from_cart(request, product_id):
     return redirect('cart')
 
 
+def discard_from_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    try:
+        cart_item = CartItem.objects.get(product=product, cart__cart_id=get_session_key(request))
+        cart_item.delete()
+    except CartItem.DoesNotExist:
+        raise Exception("cart item does not exist")
+
+    return redirect('cart')
+
+
 
 
 
