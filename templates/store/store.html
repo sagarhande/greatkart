@@ -154,13 +154,35 @@
 
 
 <nav class="mt-4" aria-label="Page navigation sample">
-  <ul class="pagination">
-    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-    <li class="page-item"><a class="page-link" href="#">2</a></li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-  </ul>
+    {% if products.has_other_pages %}
+      <ul class="pagination">
+        <!-- Previous page -->
+        {% if products.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+        {% endif %}
+       <!-- End previous page -->
+
+       <!-- Middle page numbers-->
+      {% for i in products.paginator.page_range %}
+          {% if i == products.number %}
+            <li class="page-item active"><a class="page-link" href="#">{{ products.number }}</a></li>
+          {% else %}
+              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+
+      {% endfor %}
+
+       <!-- Next page -->
+        {% if products.has_next %}
+             <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}">Next</a></li>
+        {% else %}
+             <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+        {% endif %}
+      <!-- End next page -->
+      </ul>
+    {% endif %}
 </nav>
 
 	</main> <!-- col.// -->
