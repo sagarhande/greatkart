@@ -144,7 +144,7 @@
 						<!-- <del class="price-old">$1999</del> -->
 					</div> <!-- price-wrap.// -->
 				</div>
-				<a href="{% url 'add_to_cart' product.id %}" class="btn btn-block btn-primary">Add to cart </a>
+				<a href="{{ product.get_url }}" class="btn btn-block btn-outline-primary">view details</a>
 			</figcaption>
 		</figure>
 	</div> <!-- col.// -->
