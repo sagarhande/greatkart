@@ -8,8 +8,8 @@ from store.models import Product
 
 
 class Cart(models.Model):
-    cart_id = models.CharField(max_length=255, blank=True)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    cart_id = models.CharField(max_length=255, blank=True, null=True)
+    # account = models.ForeignKey(Account, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -23,4 +23,7 @@ class CartItem(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.product
+        return self.product.name
+
+    def sub_total(self):
+        return self.product.price*self.quantity
