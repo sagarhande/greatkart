@@ -131,27 +131,36 @@
 </header><!-- sect-heading -->
 
 <div class="row">
-    {% for product in products %}
-	<div class="col-md-4">
-		<figure class="card card-product-grid">
-			<div class="img-wrap">
+  {% if products %}
+        <!-- If Products found -->
+        {% for product in products %}
+        <div class="col-md-4">
+            <figure class="card card-product-grid">
+                <div class="img-wrap">
 
-                <a href="{{ product.get_url }}" class="img-wrap"><img src="{{ product.image.url }}"></a>
+                    <a href="{{ product.get_url }}" class="img-wrap"><img src="{{ product.image.url }}"></a>
 
-			</div> <!-- img-wrap.// -->
-			<figcaption class="info-wrap">
-				<div class="fix-height">
-					<a href="{{ product.get_url }}" class="title">{{ product.name }}</a>
-					<div class="price-wrap mt-2">
-						<span class="price">${{ product.price }}</span>
-						<!-- <del class="price-old">$1999</del> -->
-					</div> <!-- price-wrap.// -->
-				</div>
-				<a href="{{ product.get_url }}" class="btn btn-block btn-outline-primary">view details</a>
-			</figcaption>
-		</figure>
-	</div> <!-- col.// -->
-    {% endfor %}
+                </div> <!-- img-wrap.// -->
+                <figcaption class="info-wrap">
+                    <div class="fix-height">
+                        <a href="{{ product.get_url }}" class="title">{{ product.name }}</a>
+                        <div class="price-wrap mt-2">
+                            <span class="price">${{ product.price }}</span>
+                            <!-- <del class="price-old">$1999</del> -->
+                        </div> <!-- price-wrap.// -->
+                    </div>
+                    <a href="{{ product.get_url }}" class="btn btn-block btn-outline-primary">view details</a>
+                </figcaption>
+            </figure>
+        </div> <!-- col.// -->
+        {% endfor %}
+    {% else %}
+      <!-- If no products -->
+        <div class="col-md-10">
+            <h2 class="text-black-50">No item found! Please try again.</h2>
+        </div>
+
+    {% endif %}
 
 </div> <!-- row end.// -->
 
