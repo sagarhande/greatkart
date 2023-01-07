@@ -17,10 +17,10 @@ def store(request, category_slug=None):
     if category_slug:
         # Get products of specific category
         category = get_object_or_404(Category, slug=category_slug)
-        products = Product.objects.filter(category=category, is_available=True)
+        products = Product.objects.filter(category=category, is_available=True).order_by("id")
     else:
         # Get all products
-        products = Product.objects.all().filter(is_available=True)
+        products = Product.objects.all().filter(is_available=True).order_by("id")
 
     # Set paginator
     paginator = Paginator(products, 6)

@@ -2,6 +2,7 @@
 
 # Django imports.
 from django.shortcuts import render, get_object_or_404, redirect
+from django.core.exceptions import ObjectDoesNotExist
 
 # First party imports.
 from store.models import Product
@@ -16,8 +17,7 @@ def cart(request, total=0, quantity=0, cart_items=None):
         for cart_item in cart_items:
             total += (cart_item.sub_total())
             quantity += cart_item.quantity
-            print(total, quantity)
-    except Exception:
+    except ObjectDoesNotExist:
         pass
 
     context = {
