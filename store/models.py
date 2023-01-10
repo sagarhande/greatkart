@@ -5,6 +5,7 @@ from django.db import models
 from django.urls import reverse
 # First party imports.
 from category.models import Category
+from .managers import *
 
 # Third party imports.
 
@@ -38,6 +39,8 @@ class Variation(models.Model):
     variation_value = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now=True)
+
+    objects = VariationManager()
 
 
     def __str__(self) -> str:

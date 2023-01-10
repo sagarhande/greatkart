@@ -18,7 +18,7 @@
 		</aside>
 		<main class="col-md-6 border-left">
 
- <form action="{% url 'add_to_cart' product.id %}" method="GET">
+ <form action="{% url 'add_to_cart' product.id %}" method="POST"> {% csrf_token %}
 	<article class="content-body">
 
 	<h2 class="title">{{ product.name }}</h2>
@@ -31,30 +31,24 @@
 
 
 	<hr>
-		<div class="row">
-			<div class="item-option-select">
-				<h6>Choose Color</h6>
-				<select name="color" class="form-control">
-				    <option value="red"> Red </option>
-					<option value="yellow"> Yellow</option>
-					<option value="greem"> Green </option>
-				</select>
-			</div>
-		</div> <!-- row.// -->
-		<div class="row">
-			<div class="item-option-select">
-				<h6>Select Size</h6>
-				<select name="size" class="form-control">
-					<option value="small">S</option>
-					<option value="medium">M</option>
-					<option value="large">L</option>
-					<option value="extra-large">XL</option>
-				</select>
-			</div>
-		</div> <!-- row.// -->
+	{% for key, value in product_variations.items %}
+	      
+			<div class="row">
+				<div class="item-option-select">
+					<h6>Choose {{ key }}</h6>
+					<select name="{{key}}" class="form-control">
+						<option value="" disabled selected> Select </option>
+						{% for i in value %}
+							<option value="{{ i | lower }}"> {{ i | capfirst }} </option>
+						{% endfor %}
+					</select>
+				</div>
+			</div> <!-- row.// -->
+	{% endfor %}
+
 		<hr>
 		{% if product.stock > 0 %}
-			{% if is_added %}
+			{% if is_added_to_cart %}
 				<a class="btn  btn-success mr-auto">
 					<span class="text-white">Added to cart</span>
 					<i class="fas fa-check white"></i>
