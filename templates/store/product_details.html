@@ -17,78 +17,65 @@
 </article> <!-- gallery-wrap .end// -->
 		</aside>
 		<main class="col-md-6 border-left">
-<article class="content-body">
 
-<h2 class="title">{{ product.name }}</h2>
+ <form action="{% url 'add_to_cart' product.id %}" method="GET">
+	<article class="content-body">
 
-<div class="mb-3">
-	<var class="price h4">${{ product.price }}</var>
-</div>
+	<h2 class="title">{{ product.name }}</h2>
 
-<p>{{ product.description }}</p>
+	<div class="mb-3">
+		<var class="price h4">${{ product.price }}</var>
+	</div>
+
+	<p>{{ product.description }}</p>
 
 
-<hr>
-	<div class="row">
-		<div class="item-option-select">
-			<h6>Choose Color</h6>
-			<div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-			  <label class="btn btn-light">
-			    <input type="radio" name="radio_color"> Silver
-			  </label>
-			  <label class="btn btn-light">
-			    <input type="radio" name="radio_color" > Gray
-			  </label>
-			  <label class="btn btn-light active">
-			    <input type="radio" name="radio_color checked"> Gold
-			  </label>
-			  <label class="btn btn-light">
-			    <input type="radio" name="radio_color"> Black
-			  </label>
-			</div>
-		</div>
-	</div> <!-- row.// -->
-	<div class="row">
-		<div class="item-option-select">
-			<h6>Select Size</h6>
-			<div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-			  <label class="btn btn-light">
-			    <input type="radio" name="radio_color"> S
-			  </label>
-			  <label class="btn btn-light active">
-			    <input type="radio" name="radio_color" checked> M
-			  </label>
-			  <label class="btn btn-light">
-			    <input type="radio" name="radio_color"> L
-			  </label>
-			  <label class="btn btn-light">
-			    <input type="radio" name="radio_color"> XL
-			  </label>
-			</div>
-		</div>
-	</div> <!-- row.// -->
 	<hr>
-    {% if product.stock > 0 %}
-        {% if is_added %}
-            <a class="btn  btn-success mr-auto">
-                <span class="text-white">Added to cart</span>
-                 <i class="fas fa-check white"></i>
-            </a>
-            <a href="{% url 'cart' %}" class="btn  btn-outline-primary mr-auto"  style="margin-left: fill">
-                <span class="text">Go to cart</span>
-                <i class="fas fa-eye"></i>
-            </a>
-        {% else %}
-            <a href="{% url 'add_to_cart' product.id %}" class="btn  btn-primary">
-                <span class="text">Add to cart</span>
-                <i class="fas fa-shopping-cart"></i>
-            </a>
-        {% endif %}
-    {% else %}
-        <span class="btn btn-danger">Out of stock</span>
-    {% endif %}
+		<div class="row">
+			<div class="item-option-select">
+				<h6>Choose Color</h6>
+				<select name="color" class="form-control">
+				    <option value="red"> Red </option>
+					<option value="yellow"> Yellow</option>
+					<option value="greem"> Green </option>
+				</select>
+			</div>
+		</div> <!-- row.// -->
+		<div class="row">
+			<div class="item-option-select">
+				<h6>Select Size</h6>
+				<select name="size" class="form-control">
+					<option value="small">S</option>
+					<option value="medium">M</option>
+					<option value="large">L</option>
+					<option value="extra-large">XL</option>
+				</select>
+			</div>
+		</div> <!-- row.// -->
+		<hr>
+		{% if product.stock > 0 %}
+			{% if is_added %}
+				<a class="btn  btn-success mr-auto">
+					<span class="text-white">Added to cart</span>
+					<i class="fas fa-check white"></i>
+				</a>
+				<a href="{% url 'cart' %}" class="btn  btn-outline-primary mr-auto"  style="margin-left: fill">
+					<span class="text">Go to cart</span>
+					<i class="fas fa-eye"></i>
+				</a>
+			{% else %}
+				<button type="submit" class="btn  btn-primary">
+					<span class="text">Add to cart</span>
+					<i class="fas fa-shopping-cart"></i>
+				</button>
+			{% endif %}
+		{% else %}
+			<span class="btn btn-danger">Out of stock</span>
+		{% endif %}
 
-</article> <!-- product-info-aside .// -->
+	</article> <!-- product-info-aside .// -->
+</form>
+
 		</main> <!-- col.// -->
 	</div> <!-- row.// -->
 </div> <!-- card.// -->

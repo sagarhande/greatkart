@@ -31,6 +31,10 @@ def cart(request, total=0, quantity=0, cart_items=None):
 
 
 def add_to_cart(request, product_id):
+    
+    color = request.GET.get("color")   # Coming from select tab in from eg. <select name="color" class="form-control">
+    size = request.GET.get("size")     # Coming from select tab in from
+
     product = get_object_or_404(Product, id=product_id)
     try:
         # We storing session key as a cart id
