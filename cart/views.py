@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ObjectDoesNotExist
 
 # First party imports.
-from store.models import Product
+from store.models import Product, Variation
 from cart.models import Cart, CartItem
 from common.services import get_or_create_session_key, get_session_key
 
@@ -31,34 +31,46 @@ def cart(request, total=0, quantity=0, cart_items=None):
 
 
 def add_to_cart(request, product_id):
-    
-    color = request.GET.get("color")   # Coming from select tab in from eg. <select name="color" class="form-control">
-    size = request.GET.get("size")     # Coming from select tab in from
-
     product = get_object_or_404(Product, id=product_id)
-    try:
-        # We storing session key as a cart id
-        cart = Cart.objects.get(cart_id=get_session_key(request))
+    
 
-    except Cart.DoesNotExist :
-        cart = Cart.objects.create(
-            cart_id=get_or_create_session_key(request)
-            )
-        cart.save()
+    if request.method == 'POST':
+        for key in request.POST:
+            value = request.POST.get(key)      # Coming from select tab in from eg. <select name="color" class="form-control">
+            
+            try:
+                variation =  Variation.objects.get(product=product, variation_category__iexact=key, variation_value__iexact=value)
+            except:
+                variation = Variation.objects.create(
+                    product=product,
+                     variation_category=key,
+                     variation_value=value,
+                     is_active=True,
+                )
+            
+        try:
+            # We storing session key as a cart id
+            cart = Cart.objects.get(cart_id=get_session_key(request))
 
-    try:
-        cart_item = CartItem.objects.get(product = product, cart=cart)
-        cart_item.quantity = cart_item.quantity + 1
-        cart_item.save()
+        except Cart.DoesNotExist :
+            cart = Cart.objects.create(
+                cart_id=get_or_create_session_key(request)
+                )
+            cart.save()
 
-    except CartItem.DoesNotExist:
-        cart_item = CartItem.objects.create(
-            product=product,
-            cart=cart,
-            quantity=1,
-            is_active=True
-            )
-        cart_item.save()
+        try:
+            cart_item = CartItem.objects.get(product = product, cart=cart)
+            cart_item.quantity = cart_item.quantity + 1
+            cart_item.save()
+
+        except CartItem.DoesNotExist:
+            cart_item = CartItem.objects.create(
+                product=product,
+                cart=cart,
+                quantity=1,
+                is_active=True
+                )
+            cart_item.save()
 
     return redirect('cart')
 
