@@ -4,7 +4,7 @@
 from django.contrib import admin
 
 # First party imports.
-from .models import Product
+from .models import *
 
 # Third party imports.
 
@@ -16,3 +16,4 @@ class AdminProduct(admin.ModelAdmin):
 
 
 admin.site.register(Product, AdminProduct)
+admin.site.register(Variation)
