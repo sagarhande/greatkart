@@ -32,7 +32,7 @@ def cart(request, total=0, quantity=0, cart_items=None):
 
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    
+    product_variations = []
 
     if request.method == 'POST':
         for key in request.POST:
@@ -48,9 +48,12 @@ def add_to_cart(request, product_id):
                      is_active=True,
                 )
             
+            product_variations.append(variation)
+
+        # Get or Create Cart
         try:
-            # We storing session key as a cart id
-            cart = Cart.objects.get(cart_id=get_session_key(request))
+           
+            cart = Cart.objects.get(cart_id=get_session_key(request))  # We storing session key as a cart id
 
         except Cart.DoesNotExist :
             cart = Cart.objects.create(
@@ -58,8 +61,12 @@ def add_to_cart(request, product_id):
                 )
             cart.save()
 
+        # Add cart item
         try:
             cart_item = CartItem.objects.get(product = product, cart=cart)
+            if len(product_variations) > 0:
+                for item in product_variations:
+                    cart_item.product_variation.add(item)  # As this is many to many relationship
             cart_item.quantity = cart_item.quantity + 1
             cart_item.save()
 
@@ -70,6 +77,9 @@ def add_to_cart(request, product_id):
                 quantity=1,
                 is_active=True
                 )
+            if len(product_variations) > 0:
+                for item in product_variations:
+                    cart_item.product_variation.add(item)
             cart_item.save()
 
     return redirect('cart')
