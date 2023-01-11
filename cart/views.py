@@ -36,6 +36,11 @@ def add_to_cart(request, product_id):
 
     if request.method == 'POST':
         for key in request.POST:
+            
+            # Check for valid variation category
+            if key not in Variation.variation_category_list:
+                continue
+
             value = request.POST.get(key)      # Coming from select tab in from eg. <select name="color" class="form-control">
             
             try:

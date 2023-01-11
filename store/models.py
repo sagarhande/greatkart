@@ -41,6 +41,8 @@ class Variation(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
     objects = VariationManager()
+    
+    variation_category_list = ['color', 'size']
 
 
     def __str__(self) -> str:
