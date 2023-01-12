@@ -34,7 +34,6 @@ def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     product_variations = []
 
-    print(request.POST)
 
     if request.method == 'POST':
         for key in request.POST:
@@ -121,16 +120,10 @@ def add_to_cart(request, product_id):
     return redirect('cart')
 
 
-def remove_from_cart(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    try:
-        # We storing session key as a cart id
-        cart = Cart.objects.get(cart_id=get_session_key(request))
-    except Cart.DoesNotExist:
-        raise Exception("cart not present")
+def remove_from_cart(request, cart_item_id):
 
     try:
-        cart_item = CartItem.objects.get(product=product, cart=cart)
+        cart_item = CartItem.objects.get(id=cart_item_id)
         cart_item.quantity = cart_item.quantity - 1
         if cart_item.quantity <= 0:
             cart_item.delete()
@@ -142,11 +135,9 @@ def remove_from_cart(request, product_id):
     return redirect('cart')
 
 
-def discard_from_cart(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-
+def discard_from_cart(request, cart_item_id):
     try:
-        cart_item = CartItem.objects.filter(product=product, cart__cart_id=get_session_key(request)).delete()
+        CartItem.objects.get(id=cart_item_id).delete()
     except CartItem.DoesNotExist:
         raise Exception("cart item does not exist")
 
