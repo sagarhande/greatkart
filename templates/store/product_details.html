@@ -48,22 +48,10 @@
 
 		<hr>
 		{% if product.stock > 0 %}
-			{% if is_added_to_cart %}
-				<a class="btn  btn-success mr-auto">
-					<span class="text-white">Added to cart</span>
-					<i class="fas fa-check white"></i>
-				</a>
-				<button type="submit" class="btn  btn-primary">
-					<span class="text">Add another one</span>
-					<i class="fas fa-shopping-cart"></i>
-				</button>
-
-			{% else %}
-				<button type="submit" class="btn  btn-primary">
-					<span class="text">Add to cart</span>
-					<i class="fas fa-shopping-cart"></i>
-				</button>
-			{% endif %}		
+			<button type="submit" class="btn  btn-primary">
+				<span class="text">Add to cart</span>
+				<i class="fas fa-shopping-cart"></i>
+			</button>
 		{% else %}
 			<span class="btn btn-danger">Out of stock</span>
 		{% endif %}
