@@ -2,6 +2,7 @@
 
 # Django imports.
 from django.shortcuts import render, redirect, HttpResponse
+from django.contrib import messages
 
 # First party imports.
 from .forms import RegistrationForm
@@ -27,15 +28,16 @@ def register(request):
                                                phone_number=phone_number,
                                                password=password
                                                 )
-            return redirect('login')
-        else:
-            return render(request,'accounts/register.html', context={"form": form})
+            messages.success(request,message="Registered successfully!!")
+            
     else:
         form = RegistrationForm()
-        context = {
-            "form": form,
-        }
-        return render(request, 'accounts/register.html', context=context)
+
+
+    context = {
+        "form": form,
+    }
+    return render(request, 'accounts/register.html', context=context)
 
 
 def login(request):
