@@ -29,7 +29,7 @@ def register(request):
                                                 )
             return redirect('login')
         else:
-            return HttpResponse(form.errors.pop("__all__"))
+            return render(request,'accounts/register.html', context={"form": form})
     else:
         form = RegistrationForm()
         context = {

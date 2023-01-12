@@ -49,7 +49,10 @@
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block"> Register  </button>
                     </div> <!-- form-group// -->      
-                        
+                
+                <!-- return form.errors here -->
+                <span class="text-danger"> {{ form.email.errors }} </span>
+                <span class="text-danger"> {{ form.non_field_errors }} </span>
                 </form>
             </article><!-- card-body.// -->
         </div> <!-- card .// -->
