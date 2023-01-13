@@ -2,7 +2,7 @@
 
 # Django imports.
 from django.shortcuts import render, redirect, HttpResponse
-from django.contrib import messages
+from django.contrib import messages,auth
 
 # First party imports.
 from .forms import RegistrationForm
@@ -41,6 +41,20 @@ def register(request):
 
 
 def login(request):
+    if request.method == 'POST':
+        email = request.POST.get("email")           # This is coming from name attr of input tag
+        password = request.POST.get("password")     # eg- <input type="email" class="form-control" name="email" >
+
+        user = auth.authenticate(email=email, password=password)
+        print("HERE: ", user, email, password)
+        if user:
+            auth.login(request, user)
+            messages.success(request, "login successful!")
+            return redirect('home')
+        else:
+            messages.error(request, "Invalid login credentials!")
+            return redirect('login')
+
     return render(request, 'accounts/login.html')
 
 
