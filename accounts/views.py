@@ -3,7 +3,7 @@
 # Django imports.
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib import messages,auth
-
+from django.contrib.auth.decorators import login_required
 # First party imports.
 from .forms import RegistrationForm
 from .models import Account
@@ -57,6 +57,8 @@ def login(request):
 
     return render(request, 'accounts/login.html')
 
-
+@login_required(login_url='login')
 def logout(request):
-    return 
+    auth.logout(request)
+    messages.success(request, "Logout successfully!")
+    return redirect('login') 
