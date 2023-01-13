@@ -57,7 +57,6 @@ def login(request):
         print("HERE: ", user, email, password)
         if user:
             auth.login(request, user)
-            messages.success(request, "login successful!")
             return redirect('home')
         else:
             messages.error(request, "Invalid login credentials!")
@@ -91,3 +90,9 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, "Invalid activation link!")
         return redirect('register')
+
+
+@login_required(login_url='login')
+def dashboard(request):
+    return render(request, 'accounts/dashboard.html')
+    pass
