@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 # First party imports.
 from .forms import RegistrationForm
 from .models import Account
+from .services import send_activation_email
 
 
 def register(request):
@@ -28,7 +29,12 @@ def register(request):
                                                phone_number=phone_number,
                                                password=password
                                                 )
-            messages.success(request,message="Registered successfully!!")
+
+            is_email_sent = send_activation_email(request, user, email)
+            if is_email_sent:
+                messages.success(request,message="Registered successfully!!")
+            else:
+                messages.error(request,message="something went wrong!!")
             
     else:
         form = RegistrationForm()
@@ -59,6 +65,11 @@ def login(request):
 
 @login_required(login_url='login')
 def logout(request):
+
     auth.logout(request)
     messages.success(request, "Logout successfully!")
     return redirect('login') 
+
+
+def activate(request, uidb64, token):
+    return HttpResponse("Activated!")
