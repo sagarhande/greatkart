@@ -34,7 +34,7 @@ def register(request):
 
             is_email_sent = send_activation_email(request, user, email)
             if is_email_sent:
-                messages.success(request,message=f"Account activation link sent to {email}")
+                return redirect(f'accounts/login/?command=verification&email={email}')
             else:
                 messages.error(request,message="something went wrong!!")
             
