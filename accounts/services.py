@@ -32,5 +32,23 @@ def send_activation_email(request, user, email):
 
     to_email = email
     email = EmailMessage(mail_sub, message, to=[to_email])
-    print(vars(email))
+    return email.send()
+
+
+
+def send_password_reset_email(request, user, email):
+    """ 
+    Send reset password email to user email 
+    """
+    site = get_current_site(request)
+    mail_sub = "GreatKart account password request"
+    message = render_to_string('accounts/email_reset_password_template.html', context= {
+               'user': user,
+               'domain': site,
+               'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+               'token': default_token_generator.make_token(user),
+           })
+
+    to_email = email
+    email = EmailMessage(mail_sub, message, to=[to_email])
     return email.send()
