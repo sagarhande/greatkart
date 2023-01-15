@@ -63,8 +63,8 @@ def login(request):
         user = auth.authenticate(email=email, password=password)
         if user:
             try:
-                cart = Cart.objects.get(cart_id=get_session_key(request))  # We storing session key as a cart id
-                cart_items = CartItem.objects.filter(cart=cart)
+                cart = Cart.objects.filter(cart_id=get_session_key(request))  # We storing session key as a cart id
+                cart_items = CartItem.objects.filter(cart=cart[:1])
 
                 if cart_items:
                     for item in cart_items:

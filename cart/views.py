@@ -73,7 +73,10 @@ def add_to_cart(request, product_id):
             cart.save()
 
         # Add cart item
-        cart_items = CartItem.objects.filter(product = product, cart=cart)
+        if request.user.is_authenticated:
+            cart_items = CartItem.objects.filter(product = product, user=request.user)
+        else:
+            cart_items = CartItem.objects.filter(product = product, cart=cart)
 
         if cart_items.exists() :
 
@@ -85,17 +88,20 @@ def add_to_cart(request, product_id):
             existing_variations = {} 
             for item in cart_items:
                 existing_variations[item] = set(item.product_variation.all())
+            
+            print("\n\nExisting variations: ", existing_variations)
+            print("\n")
 
             is_exist = False
             for key, value in existing_variations.items():
                 if set(product_variations) == value:
                     is_exist= True
-                    item = key
-
+                    existing_item = key
+            print("\n Is Already Exist: ", is_exist)
             if is_exist:
                 # increase quantity
-                item.quantity += 1
-                item.save()
+                existing_item.quantity += 1
+                existing_item.save()
 
             else:
                 # craete new one
@@ -103,7 +109,8 @@ def add_to_cart(request, product_id):
                     product=product,
                     cart=cart,
                     quantity=1,
-                    is_active=True
+                    is_active=True,
+                    user = request.user if request.user.is_authenticated else None
                 )
                 if len(product_variations) > 0: 
                     for item in product_variations:
@@ -115,7 +122,8 @@ def add_to_cart(request, product_id):
                 product=product,
                 cart=cart,
                 quantity=1,
-                is_active=True
+                is_active=True,
+                user = request.user if request.user.is_authenticated else None,
                 )
             if len(product_variations) > 0: 
                 for item in product_variations:
