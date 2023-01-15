@@ -144,8 +144,29 @@ def discard_from_cart(request, cart_item_id):
     return redirect('cart')
 
 
-def checkout(request):
-    return render(request, "store/checkout.html")
+def checkout(request, total=0, quantity=0, cart_items=None):
+    if request.method == "POST":
+        pass
+
+    else:
+
+        try:
+            cart = Cart.objects.get(cart_id=get_session_key(request))
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+            for cart_item in cart_items:
+                total += (cart_item.sub_total())
+                quantity += cart_item.quantity
+        except ObjectDoesNotExist:
+            pass
+
+        context = {
+            "total": total,
+            "quantity": quantity,
+            "cart_items": cart_items,
+            "tax": round(total*0.02, 2),   # 2% tax on total
+            "grand_total": total+(total*0.02),
+            }
+        return render(request, "store/checkout.html", context=context)
 
 
 
