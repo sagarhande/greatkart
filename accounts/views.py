@@ -11,7 +11,8 @@ from django.contrib.auth.tokens import default_token_generator
 from .forms import RegistrationForm
 from .models import Account
 from .services import send_activation_email, send_password_reset_email
-
+from cart.models import Cart, CartItem
+from common.services import get_session_key, get_or_create_session_key
 
 def register(request):
 
@@ -61,6 +62,18 @@ def login(request):
 
         user = auth.authenticate(email=email, password=password)
         if user:
+            try:
+                cart = Cart.objects.get(cart_id=get_session_key(request))  # We storing session key as a cart id
+                cart_items = CartItem.objects.filter(cart=cart)
+
+                if cart_items:
+                    for item in cart_items:
+                        item.user = user
+                        item.save()
+
+            except :
+               pass
+            
             auth.login(request, user)
             return redirect("home")
         else:
