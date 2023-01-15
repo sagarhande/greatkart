@@ -144,6 +144,9 @@ def discard_from_cart(request, cart_item_id):
     return redirect('cart')
 
 
+def checkout(request):
+    return render(request, "store/checkout.html")
+
 
 
 
