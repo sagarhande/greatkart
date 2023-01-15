@@ -3,6 +3,7 @@
 # Django imports.
 from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.decorators import login_required
 
 # First party imports.
 from store.models import Product, Variation
@@ -143,7 +144,7 @@ def discard_from_cart(request, cart_item_id):
 
     return redirect('cart')
 
-
+@login_required(login_url="login")
 def checkout(request, total=0, quantity=0, cart_items=None):
     if request.method == "POST":
         pass
