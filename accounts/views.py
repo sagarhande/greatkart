@@ -15,6 +15,9 @@ from cart.models import Cart, CartItem
 from common.services import get_session_key, get_or_create_session_key
 from store.models import Product
 
+# Third party imports
+import requests
+
 
 def register(request):
 
@@ -99,7 +102,20 @@ def login(request):
                 pass
 
             auth.login(request, user)
-            return redirect("home")
+            url = request.META.get("HTTP_REFERER")
+            try:
+                query = requests.utils.urlparse(url).query  # next=/cart/checkout
+                params = dict(x.split("=") for x in query.split("&"))
+
+                if "next" in params:
+                    next_page = params["next"]
+                else:
+                    next_page = "home"
+
+            except:
+                pass
+            return redirect(next_page)
+
         else:
             messages.error(request, "Invalid login credentials!")
             return redirect("login")
