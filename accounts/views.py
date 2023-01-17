@@ -10,9 +10,11 @@ from django.contrib.auth.tokens import default_token_generator
 # First party imports.
 from .forms import RegistrationForm
 from .models import Account
-from .services import send_activation_email, send_password_reset_email
+from .services import send_activation_email, send_password_reset_email, merge_cart_items
 from cart.models import Cart, CartItem
 from common.services import get_session_key, get_or_create_session_key
+from store.models import Product
+
 
 def register(request):
 
@@ -63,17 +65,39 @@ def login(request):
         user = auth.authenticate(email=email, password=password)
         if user:
             try:
-                cart = Cart.objects.filter(cart_id=get_session_key(request))  # We storing session key as a cart id
-                cart_items = CartItem.objects.filter(cart=cart[:1])
+                # Incoming
+                cart = Cart.objects.filter(cart_id=get_session_key(request))[:1]
+                cart_items = CartItem.objects.filter(cart=cart)
 
-                if cart_items:
-                    for item in cart_items:
-                        item.user = user
-                        item.save()
+                # Existing
+                ex_cart_items = CartItem.objects.filter(user=user)
 
-            except :
-               pass
-            
+                # check incoming present in Existing
+                for new_item in cart_items:
+                    is_present = False
+                    for ex_item in ex_cart_items:
+                        if new_item.product == ex_item.product and set(
+                            new_item.product_variation.all()
+                        ) == set(ex_item.product_variation.all()):
+                            # increse quantity of existing item
+                            ex_item.quantity += 1
+                            ex_item.save()
+
+                            # delete new item
+                            new_item.delete()
+                            is_present = True
+                            break
+
+                    if not is_present:
+                        # assign a current user
+                        new_item.user = user
+                        new_item.cart = ex_item.cart if ex_item else None
+                        new_item.save()
+
+            except Exception as e:
+                print("\n ERROR: ", str(e))
+                pass
+
             auth.login(request, user)
             return redirect("home")
         else:
@@ -126,7 +150,9 @@ def forgot_password(request):
                 is_email_sent = send_password_reset_email(request, user, email)
 
                 if is_email_sent:
-                    messages.success(request, f"Password reset mail has been sent to : {email}")
+                    messages.success(
+                        request, f"Password reset mail has been sent to : {email}"
+                    )
                     return redirect("login")
 
                 else:
@@ -144,7 +170,7 @@ def forgot_password(request):
 
 
 def reset_password_validate(request, uidb64, token):
-   
+
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
         user = Account._default_manager.get(pk=uid)
@@ -153,7 +179,7 @@ def reset_password_validate(request, uidb64, token):
         user = None
 
     if user and default_token_generator.check_token(user, token):
-        request.session['uid'] = uid
+        request.session["uid"] = uid
         messages.success(request, "Please request your password")
         return redirect("reset-password")
 
@@ -161,19 +187,24 @@ def reset_password_validate(request, uidb64, token):
         messages.error(request, "Activation link has expired.")
         return redirect("login")
 
+
 def reset_password(request):
     if request.method == "POST":
-        password = request.POST.get("password")  # This is coming from name attr of input tag
-        confirm_password = request.POST.get("confirm_password")  # eg- <input type="email" class="form-control" name="email" >
-        
+        password = request.POST.get(
+            "password"
+        )  # This is coming from name attr of input tag
+        confirm_password = request.POST.get(
+            "confirm_password"
+        )  # eg- <input type="email" class="form-control" name="email" >
+
         if password != confirm_password:
             messages.error(request, "passwords does not match!")
-            return redirect('reset-password')
-        
-        uid = request.session.get('uid')
+            return redirect("reset-password")
+
+        uid = request.session.get("uid")
         user = Account.objects.get(pk=uid)
         user.set_password(password)
         user.save()
         messages.success(request, "Password reseted successfully, please login now.")
-        return redirect('login')
+        return redirect("login")
     return render(request, "accounts/reset_password.html")
