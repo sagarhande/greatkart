@@ -7,3 +7,4 @@ db.sqlite3
 *.png
 *.svg
 media/
+.vscode/

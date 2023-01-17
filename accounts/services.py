@@ -52,3 +52,38 @@ def send_password_reset_email(request, user, email):
     to_email = email
     email = EmailMessage(mail_sub, message, to=[to_email])
     return email.send()
+
+
+def merge_cart_items(curr, existing):
+    final_cart_items = [list(existing)]
+    existing_dict = {}
+    incoming_dict = {}
+    product_variations = []
+    for i in existing:
+        existing_dict[i.product.id] = existing_dict.get(i.product.name, []).append(i)
+    
+    for i in curr:
+        incoming_dict[i.product.id] = incoming_dict.get(i.product.name, []).append(i)
+        product_variations.append(list(i.product_variation.all()))
+
+    for pid in incoming_dict.keys():   # incoming product id's
+        if pid in existing_dict.keys():
+            product_variations = [i.product_variation for i in  incoming_dict.get(pid)]
+            matched_items_from_existing = existing_dict.get(pid) 
+            
+            existing_variations = {} 
+            for item in matched_items_from_existing:
+                existing_variations[item] = set(item.product_variation.all())
+                
+            is_exist = False
+            for key, value in existing_variations.items():
+                if set(product_variations) == value:
+                    is_exist= True
+                    existing_item = key
+            if is_exist:
+                # increase quantity
+                existing_item.quantity += 1
+                existing_item.save()
+        else:
+            final_cart_items.append(incoming_dict.get(pid))
+
