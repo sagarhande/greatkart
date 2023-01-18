@@ -17,8 +17,10 @@ class Payment(models.Model):
     payment_method_choices = ((COD, "COD"), (NB, "Net Banking"), (PAYPAL, "PAYPAL"))
 
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
-    id = models.CharField(max_length=100)
-    method = models.CharField(choices=payment_method_choices, default=PAYPAL)
+    payment_id = models.CharField(max_length=100)
+    method = models.CharField(
+        max_length=50, choices=payment_method_choices, default=PAYPAL
+    )
     amount_paid = models.CharField(max_length=100)
     status = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -53,7 +55,7 @@ class Order(models.Model):
     pin = models.CharField(max_length=10)
     order_total = models.FloatField()
     tax = models.FloatField()
-    status = models.CharField(choices=STATUS, default="New")
+    status = models.CharField(max_length=50, choices=STATUS, default="New")
     ip = models.CharField(max_length=20, blank=True, null=True)
     is_ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
