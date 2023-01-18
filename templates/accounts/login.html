@@ -5,17 +5,17 @@
 
 <!-- ========================= SECTION CONTENT ========================= -->
 <section class="section-conten padding-y" style="min-height:84vh">
-     
-     <!-- ============================ COMPONENT VERIFICATION ================================= -->
+
+    <!-- ============================ COMPONENT VERIFICATION ================================= -->
     {% if request.GET.command == 'verification' %}
 
     <div class="container mx-auto alert alert-info" role="alert" style="max-width: 450px; margin-top:100px;">
-        <h4>Thank you for registering with GreatKart!!</h4><br>
+        <h4>Thank you for registering with LootKart!!</h4><br>
         We have send verification email to {{ request.GET.email }},
         please verify your email before login!
         <br><br>
-    
-        <span >Already verified? <a href="{% url 'login' %}">Login</a></span>
+
+        <span>Already verified? <a href="{% url 'login' %}">Login</a></span>
     </div><br>
 
     {% else %}
@@ -24,34 +24,34 @@
     <div class="card mx-auto " style="max-width: 380px; margin-top:100px;">
         <div class="card-title">{% include 'includes/alerts.html' %}</div>
 
-          <div class="card-body">
-          <h4 class="card-title mb-4">Sign in</h4>
-          <form action="{% url 'login' %}" method="POST"> {% csrf_token %}
-              <div class="form-group">
-                 <input type="email" class="form-control" placeholder="Email Address" name="email" >
-              </div> <!-- form-group// -->
-              <div class="form-group">
-                <input type="password" class="form-control" placeholder="Password" name="password" >
-              </div> <!-- form-group// -->
-              
-              <div class="form-group">
-                  <a href="{% url 'forgot-password' %}" class="float-right">Forgot password?</a> 
-               
-              </div> <!-- form-group form-check .// -->
-              <div class="form-group">
-                  <button type="submit" class="btn btn-primary btn-block"> Login  </button>
-              </div> <!-- form-group// -->    
-          </form>
-          </div> <!-- card-body.// -->
-        </div> <!-- card .// -->
-    
-         <p class="text-center mt-4">Don't have account? <a href="{% url 'register' %}">Sign up</a></p>
-         <br><br>
+        <div class="card-body">
+            <h4 class="card-title mb-4">Sign in</h4>
+            <form action="{% url 'login' %}" method="POST"> {% csrf_token %}
+                <div class="form-group">
+                    <input type="email" class="form-control" placeholder="Email Address" name="email">
+                </div> <!-- form-group// -->
+                <div class="form-group">
+                    <input type="password" class="form-control" placeholder="Password" name="password">
+                </div> <!-- form-group// -->
+
+                <div class="form-group">
+                    <a href="{% url 'forgot-password' %}" class="float-right">Forgot password?</a>
+
+                </div> <!-- form-group form-check .// -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block"> Login </button>
+                </div> <!-- form-group// -->
+            </form>
+        </div> <!-- card-body.// -->
+    </div> <!-- card .// -->
+
+    <p class="text-center mt-4">Don't have account? <a href="{% url 'register' %}">Sign up</a></p>
+    <br><br>
     <!-- ============================ COMPONENT LOGIN  END.// ================================= -->
-    
+
     {% endif %}
-    
-    </section>
-    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
 
 {% endblock %}

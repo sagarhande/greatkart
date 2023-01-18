@@ -104,17 +104,18 @@ def login(request):
             auth.login(request, user)
             url = request.META.get("HTTP_REFERER")
             try:
+                next_page = "home"
                 query = requests.utils.urlparse(url).query  # next=/cart/checkout
-                params = dict(x.split("=") for x in query.split("&"))
+                if query:
+                    params = dict(x.split("=") for x in query.split("&"))
+                    if "next" in params:
+                        next_page = "cart"
+                        # next_page = params["next"]
 
-                if "next" in params:
-                    next_page = params["next"]
-                else:
-                    next_page = "home"
+                return redirect(next_page)
 
             except:
-                pass
-            return redirect(next_page)
+                return redirect("home")
 
         else:
             messages.error(request, "Invalid login credentials!")
