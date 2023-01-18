@@ -94,7 +94,7 @@ def login(request):
                     if not is_present:
                         # assign a current user
                         new_item.user = user
-                        new_item.cart = ex_item.cart if ex_item else None
+                        new_item.cart = ex_cart_items[0].cart if ex_cart_items else None
                         new_item.save()
 
             except Exception as e:
