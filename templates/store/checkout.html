@@ -127,9 +127,13 @@
                 </table>
                 <!-- Table END -->
 
-                
-                <button type="submit" name="submit" class="btn btn-primary btn-block"> Place order</button>
-                <a href="{% url 'store' %}" class="btn btn-outline-secondary btn-block">Continue Shopping</a>
+                        {% if cart_items %}
+                        <button type="submit" name="submit" class="btn btn-primary btn-block"> Place order</button>
+                        {% else %}
+                        <button type="submit" name="submit" class="btn btn-primary btn-block disabled"> Place
+                            order</button>
+                        {% endif %}
+                        <a href="{% url 'store' %}" class="btn btn-outline-secondary btn-block">Continue Shopping</a>
 
             </form>
                 
