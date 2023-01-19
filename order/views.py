@@ -60,7 +60,7 @@ def place_order(request):
 
                 context = {
                     'order': obj,
-                    'cart_itmes': cart_items,
+                    'cart_items': cart_items,
                     'tax': tax,
                     'total': order_total,
                     'grand_total': grand_total,

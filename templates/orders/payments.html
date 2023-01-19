@@ -8,18 +8,19 @@
 <div class="container">
 
 <!-- ============================ COMPONENT 1 ================================= -->
-
+    <h4 class="text-center mb-10">Review Order And Make a Pyament </h4>
     <div class="row">
         <aside class="col-lg-8">
 
             <div class="card">
                 <h5 class="card-header">Billing Address</h5>
                 <div class="card-body">   
-                  <p class="card-text">Name: {{ order.first_name }} {{ order.last_name }} <br>
-                                       Address: {{ order.address_line1 }},  {{ order.address_line2 }}</p>
+                  <p class="card-text">Name: {{ order.full_name }} <br>
+                                       Address: {{ order.full_address }}
                                                {{ order.city }}, {{ order.state }}<br>
                                        pincode: {{ order.pin }} <br>
                                        contact: {{ order.phone }} 
+                    </p>
                 </div>
               </div>
             
@@ -53,7 +54,56 @@
               <div class="card">
                 <h5 class="card-header">Review Products</h5>
                 <div class="card-body">   
-                  <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                                  
+                <table class="table table-borderless table-shopping-cart">
+                    <thead class="text-muted">
+                    <tr class="small text-uppercase">
+                      <th scope="col">Product</th>
+                      <th scope="col" width="120">Quantity</th>
+                      <th scope="col" width="120">Price</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in cart_items %}
+                    Item : {{ item }}
+                        <tr>
+                            <td>
+                                <figure class="itemside align-items-center">
+                                    <div class="aside">
+                                        <a href="{{ item.product.get_url  }}">
+                                            <img src="{{ item.product.image.url }}" class="img-sm">
+                                        </a>
+                                    </div>
+                                    <figcaption class="info">
+                                        <a href="{{ item.product.get_url  }}"
+                                           class="title text-dark">{{ item.product.name }}</a>
+                                        <p class="text-muted small">
+                                            {% if item.product_variation.all %}
+                                                
+                                                {% for i in item.product_variation.all %}
+                                                     {{ i.variation_category | capfirst }}: {{ i.variation_value | capfirst }} <br>
+                                                {% endfor %}
+                
+                                            {% endif %}
+                                        </p>
+                                    </figcaption>
+                                </figure>
+                            </td>
+                            <td>
+                                <!-- col.// -->
+                                <label for=""> {{ item.quantity }} </label>
+                            </td>
+                            <td>
+                                <div class="price-wrap">
+                                    <var class="price">${{ item.sub_total }} </var>
+                                    <small class="text-muted"> ${{ item.product.price }} each </small>
+                                </div> <!-- price-wrap .// -->
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
                 </div>
               </div>
 
