@@ -22,10 +22,12 @@ def place_order(request):
     for cart_item in cart_items:
         order_total += cart_item.sub_total()
         quantity += cart_item.quantity
+    tax = round(order_total * 0.02, 2)
+    grand_total = order_total + tax
+
 
     if request.method == "POST":
         form = OrderForm(request.POST)
-        print("Form: ", form.is_valid())
         if form.is_valid():
             try:
                 # Store form(billing info) into Order table
@@ -41,8 +43,8 @@ def place_order(request):
                 obj.state = form.cleaned_data.get("state")
                 obj.pin = form.cleaned_data.get("pin")
                 
-                obj.tax = round(order_total * 0.02, 2)
-                obj.order_total = order_total + (order_total * 0.02)
+                obj.tax = tax
+                obj.order_total = grand_total
                 obj.ip = request.META.get("REMOTE_ADDR")
                 obj.save()
 
@@ -56,10 +58,23 @@ def place_order(request):
                 obj.order_number = current_date + str(obj.id)
                 obj.save() 
 
-                return redirect('checkout')
+                context = {
+                    'order': obj,
+                    'cart_items': cart_items,
+                    'tax': tax,
+                    'total': order_total,
+                    'grand_total': grand_total,
+
+                }
+
+                return render(request, "orders/payments.html", context)
             except Exception as e:
-                print("in Except ERROR: ", str(e))
+                print("Error :", str(e))
                 return redirect('checkout')
         
         else:
             return redirect('checkout')
+
+
+def payments(request):
+    return render(request, "orders/payments.html")
