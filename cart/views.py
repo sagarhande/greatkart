@@ -94,9 +94,6 @@ def add_to_cart(request, product_id):
             for item in cart_items:
                 existing_variations[item] = set(item.product_variation.all())
 
-            print("\n\nExisting variations: ", existing_variations)
-            print("\n")
-
             is_exist = False
             for key, value in existing_variations.items():
                 if set(product_variations) == value:
