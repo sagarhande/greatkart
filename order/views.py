@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from cart.models import CartItem
 from .forms import OrderForm
 from .models import Order, Payment, OrderProduct
+from .services import *
 
 # Third party imports
 import datetime
@@ -111,20 +112,26 @@ def payments(request):
                 is_ordered = True,
             )
             ordered_product.save()
-            print( "\nvariations: ", item.product_variation.all())
             # NOTE: while creating obj, ManyToMany field cann't be added, it should be added after save()
-            for variation in item.product_variation.all():
-                ordered_product.product_variation.add(variation) 
+            ordered_product.product_variation.set(item.product_variation.all())
+            # for variation in item.product_variation.all():
+            #     ordered_product.product_variation.add(variation) 
             ordered_product.save()
 
-
-       
-
-        # Reduce product quantity
+    
+            # Reduce product quantity
+            product = item.product
+            product.stock -= item.quantity
+            product.save()
 
         # Clear Cart
+        cart_items.delete()
 
-        # Send payment recieved email to customer
+        # Send order recieved email to customer
+        send = send_order_recived_email(request, order)
+        if not send:
+            print("Error while sending a `order recived email`")
+            pass         
 
         # Send order number and transaction ID back to user
 

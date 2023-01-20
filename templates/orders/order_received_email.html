@@ -1,0 +1,14 @@
+{% autoescape off %}
+
+Hi {{ user.first_name }},
+
+This mail is to notify you that, your order has been received,
+please find below order details.
+
+Order Number: {{ order.order_number }}
+
+
+Regards,
+Team LootKart
+
+{% endautoescape %}
