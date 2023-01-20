@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 # First party imports
 from cart.models import CartItem
 from .forms import OrderForm
-from .models import Order, Payment
+from .models import Order, Payment, OrderProduct
 
 # Third party imports
 import datetime
@@ -96,6 +96,38 @@ def payments(request):
         order.is_ordered = True
         order.status = body.get("status")
         order.save()
+
+
+        # Move cart items to OderProduct table
+        cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+        
+        for item in cart_items:
+            ordered_product = OrderProduct(
+                order = order,
+                payment = payment,
+                user = request.user,
+                product = item.product, 
+                quantity = item.quantity,
+                is_ordered = True,
+            )
+            ordered_product.save()
+            print( "\nvariations: ", item.product_variation.all())
+            # NOTE: while creating obj, ManyToMany field cann't be added, it should be added after save()
+            for variation in item.product_variation.all():
+                ordered_product.product_variation.add(variation) 
+            ordered_product.save()
+
+
+       
+
+        # Reduce product quantity
+
+        # Clear Cart
+
+        # Send payment recieved email to customer
+
+        # Send order number and transaction ID back to user
+
     except Exception as e:
         print(f"\nException While saving transaction details: {e}\n")
     return render(request, "orders/payments.html")
