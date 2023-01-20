@@ -5,10 +5,11 @@ from django.contrib.auth.decorators import login_required
 # First party imports
 from cart.models import CartItem
 from .forms import OrderForm
-from .models import Order
+from .models import Order, Payment
 
 # Third party imports
 import datetime
+import json
 
 # Create your views here.
 
@@ -69,7 +70,7 @@ def place_order(request):
 
                 return render(request, "orders/payments.html", context)
             except Exception as e:
-                print("Error :", str(e))
+                print(f"\nException While saving order details: {e}\n")
                 return redirect('checkout')
         
         else:
@@ -77,4 +78,24 @@ def place_order(request):
 
 
 def payments(request):
+    try:
+        body = json.loads(request.body)
+        order = Order.objects.get(user=request.user, order_number=body.get("orderID"), is_ordered=False)
+
+        # Store transaction details in Payment model
+        payment = Payment(
+            user = request.user,
+            payment_id = body.get("transID"),
+            status = body.get("status"),
+            method = body.get("payment_method"),
+            amount_paid = str(order.order_total),
+        )
+        payment.save()
+        # Change in Order
+        order.payment = payment
+        order.is_ordered = True
+        order.status = body.get("status")
+        order.save()
+    except Exception as e:
+        print(f"\nException While saving transaction details: {e}\n")
     return render(request, "orders/payments.html")
