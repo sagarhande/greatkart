@@ -1,11 +1,13 @@
 # Django imports
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
 # First party imports
 from cart.models import CartItem
 from .forms import OrderForm
-from .models import Order, Payment
+from .models import Order, Payment, OrderProduct
+from .services import *
 
 # Third party imports
 import datetime
@@ -96,6 +98,72 @@ def payments(request):
         order.is_ordered = True
         order.status = body.get("status")
         order.save()
+
+
+        # Move cart items to OderProduct table
+        cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+        
+        for item in cart_items:
+            ordered_product = OrderProduct(
+                order = order,
+                payment = payment,
+                user = request.user,
+                product = item.product, 
+                quantity = item.quantity,
+                is_ordered = True,
+            )
+            ordered_product.save()
+            # NOTE: while creating obj, ManyToMany field cann't be added, it should be added after save()
+            ordered_product.product_variation.set(item.product_variation.all())
+            # for variation in item.product_variation.all():
+            #     ordered_product.product_variation.add(variation) 
+            ordered_product.save()
+
+    
+            # Reduce product quantity
+            product = item.product
+            product.stock -= item.quantity
+            product.save()
+
+        # Clear Cart
+        cart_items.delete()
+
+        # Send order recieved email to customer
+        send = send_order_recived_email(request, order)
+        if not send:
+            print("Error while sending a `order recived email`")
+            pass         
+
+        # Send order number and transaction ID back to user
+        data = {
+            'order_number': order.order_number,
+            'payment_id': payment.payment_id
+        }
+        return JsonResponse(data)
+
+
     except Exception as e:
         print(f"\nException While saving transaction details: {e}\n")
-    return render(request, "orders/payments.html")
+        return JsonResponse({"Error": f"{e}"})
+
+
+
+
+def order_successful(request):
+    try:
+        order_number = request.GET.get("order_number")
+        payment_id = request.GET.get("payment_id")
+
+        order = Order.objects.get(order_number=order_number, is_ordered=True)
+        payment = Payment.objects.get(payment_id=payment_id)
+        ordered_items = OrderProduct.objects.filter(order = order, payment = payment,  is_ordered = True,)
+        context = {
+            'order': order,
+            'payment': payment,
+            'ordered_items': ordered_items,
+            'sub_total': order.order_total - order.tax
+        }
+        return render(request, "orders/order_successful.html", context=context)
+    except Exception as e:
+        print(f"Exception occure while rendering order_successful.html\n Error: {e}")
+        return render(request, "orders/order_successful.html")

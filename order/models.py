@@ -77,7 +77,7 @@ class OrderProduct(models.Model):
     )
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    variation = models.ForeignKey(Variation, on_delete=models.CASCADE)
+    product_variation = models.ManyToManyField(Variation, blank=True)
     quantity = models.IntegerField()
     is_ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

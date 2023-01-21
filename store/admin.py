@@ -9,10 +9,19 @@ from .models import *
 # Third party imports.
 
 
+class ReviewRatingInline(admin.TabularInline):
+    model = ReviewRating
+    extra = 0
+    readonly_fields = ('product', 'user', )
+    fields = ('rating', 'user', 'subject', 'status')
+
+
+
 # To pre-populate slug field configure AdminProduct class
 class AdminProduct(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     list_display = ('name', 'price', 'stock', 'is_available', 'category', 'modified_date')
+    inlines = (ReviewRatingInline,)
 
 # Admin settings for Variation model
 class VariationAdmin(admin.ModelAdmin):
@@ -20,6 +29,10 @@ class VariationAdmin(admin.ModelAdmin):
     list_editable = ('is_active',)
     list_filter = ('product','variation_category', 'variation_value')
             
+class ReviewRatingAdmin(admin.ModelAdmin):
+     list_display = ('product', 'rating', 'user', 'subject', 'status', 'created_at')
+     list_editable = ('rating', 'subject', 'status')
 
 admin.site.register(Product, AdminProduct)
 admin.site.register(Variation, VariationAdmin)
+admin.site.register(ReviewRating, ReviewRatingAdmin)
