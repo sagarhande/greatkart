@@ -1,6 +1,7 @@
 # Django imports
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
 # First party imports
 from cart.models import CartItem
@@ -134,7 +135,35 @@ def payments(request):
             pass         
 
         # Send order number and transaction ID back to user
+        data = {
+            'order_number': order.order_number,
+            'payment_id': payment.payment_id
+        }
+        return JsonResponse(data)
+
 
     except Exception as e:
         print(f"\nException While saving transaction details: {e}\n")
-    return render(request, "orders/payments.html")
+        return JsonResponse({"Error": f"{e}"})
+
+
+
+
+def order_successful(request):
+    try:
+        order_number = request.GET.get("order_number")
+        payment_id = request.GET.get("payment_id")
+
+        order = Order.objects.get(order_number=order_number, is_ordered=True)
+        payment = Payment.objects.get(payment_id=payment_id)
+        ordered_items = OrderProduct.objects.filter(order = order, payment = payment,  is_ordered = True,)
+        context = {
+            'order': order,
+            'payment': payment,
+            'ordered_items': ordered_items,
+            'sub_total': order.order_total - order.tax
+        }
+        return render(request, "orders/order_successful.html", context=context)
+    except Exception as e:
+        print(f"Exception occure while rendering order_successful.html\n Error: {e}")
+        return render(request, "orders/order_successful.html")
