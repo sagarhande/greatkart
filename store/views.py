@@ -1,14 +1,16 @@
 # Standard library imports.
 
 # Django imports.
-from django.shortcuts import render, get_object_or_404, HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
+from django.contrib import messages
 
 # First party imports.
 from category.models import Category
-from .models import Product, Variation
+from .models import Product, ReviewRating
 from cart.models import CartItem
+from .forms import ReviewForm
 from common.services import get_or_create_session_key
 from .services import get_product_variations_data
 
@@ -82,3 +84,31 @@ def search(request):
         "products_count": products_count,
     }
     return render(request, "store/store.html", context=context)
+
+
+def submit_review(request, product_id):
+    url = request.META.get('HTTP_REFERER')
+    if request.method == "POST":
+        try:
+            review = ReviewRating.objects.get(user__id=request.user.id, product__id=product_id)
+            form = ReviewForm(request.POST,instance=review)
+            form.save()
+            messages.success(request, "Thank you, your review has been updated!")
+            return  (url)
+        except ReviewRating.DoesNotExist:
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                obj = ReviewRating(
+                    subject = form.cleaned_data.get("subject"),
+                    rating = form.cleaned_data.get("rating"),
+                    review = form.cleaned_data.get("review"),
+                    ip = request.META.get('REMOTE_ADDR'),
+                    product_id = product_id,
+                    user = request.user,
+                )
+
+                obj.save()
+                messages.success(request, "Thank you, your review has been submitted!")
+
+                return redirect(url)
+
