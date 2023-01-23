@@ -66,6 +66,8 @@ def product_detail(request, category_slug, product_slug):
         "product_variations": get_product_variations_data(product),
         "is_ordered_previously": is_ordered_previously,
         "reviews": reviews,
+        "average_rating": product.average_rating(),
+        "review_count": product.review_count(),
     }
 
     return render(request, "store/product_details.html", context=context)

@@ -25,6 +25,20 @@
 
 	<h2 class="title">{{ product.name }}</h2>
 
+			<!-- Show average rating -->
+			<div class="rating-star">
+				<span>
+					<i class="fa fa-star{% if average_rating < 0.5 %}-o{% elif average_rating >= 0.5 and average_rating < 1 %}-half-o{% endif %}" aria-hidden="true"></i>
+					<i class="fa fa-star{% if average_rating < 1.5 %}-o{% elif average_rating >= 1.5 and average_rating < 2 %}-half-o{% endif %}" aria-hidden="true"></i>
+					<i class="fa fa-star{% if average_rating < 2.5 %}-o{% elif average_rating >= 2.5 and average_rating < 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+					<i class="fa fa-star{% if average_rating < 3.5 %}-o{% elif average_rating >= 3.5 and average_rating < 4 %}-half-o{% endif %}" aria-hidden="true"></i>
+					<i class="fa fa-star{% if average_rating < 4.5 %}-o{% elif average_rating >= 4.5 and average_rating < 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+					<span> {{review_count}} reviews</span>
+				</span>
+			</div>
+			<!-- End show average rating -->
+			<br>
+
 	<div class="mb-3">
 		<var class="price h4">${{ product.price }}</var>
 	</div>
@@ -132,6 +146,18 @@
 
 	<header class="section-heading">
 		<h3>Customer Reviews </h3>
+			<!-- Show average rating -->
+			<div class="rating-star">
+				<span>
+					<i class="fa fa-star{% if average_rating < 0.5 %}-o{% elif average_rating >= 0.5 and average_rating < 1 %}-half-o{% endif %}" aria-hidden="true"></i>
+					<i class="fa fa-star{% if average_rating < 1.5 %}-o{% elif average_rating >= 1.5 and average_rating < 2 %}-half-o{% endif %}" aria-hidden="true"></i>
+					<i class="fa fa-star{% if average_rating < 2.5 %}-o{% elif average_rating >= 2.5 and average_rating < 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+					<i class="fa fa-star{% if average_rating < 3.5 %}-o{% elif average_rating >= 3.5 and average_rating < 4 %}-half-o{% endif %}" aria-hidden="true"></i>
+					<i class="fa fa-star{% if average_rating < 4.5 %}-o{% elif average_rating >= 4.5 and average_rating < 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+					<span> {{review_count}} reviews</span>
+				</span>
+			</div>
+			<!-- End show average rating -->
 
 	</header>
 
