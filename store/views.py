@@ -50,17 +50,22 @@ def product_detail(request, category_slug, product_slug):
     is_added_to_cart = CartItem.objects.filter(
         product=product, cart__cart_id=get_or_create_session_key(request)
     ).exists()
-
+    
+    # Check if current user has ordered product previously
     try:
         is_ordered_previously = OrderProduct.objects.filter(user__id = request.user.id, product=product, is_ordered=True).exists()            
     except OrderProduct.DoesNotExist:
         is_ordered_previously = None
+
+    # Get user reviews of product
+    reviews = ReviewRating.objects.filter(product=product, status=True)
 
     context = {
         "product": product,
         "is_added_to_cart": is_added_to_cart,
         "product_variations": get_product_variations_data(product),
         "is_ordered_previously": is_ordered_previously,
+        "reviews": reviews,
     }
 
     return render(request, "store/product_details.html", context=context)
