@@ -47,6 +47,9 @@ class Variation(models.Model):
 
     def __str__(self) -> str:
         return self.variation_category + " : "+ self.variation_value
+    
+    def average_rating(self):
+        reviews = ReviewRating.objects.filter(product=self, is_active=True)
 
 class ReviewRating(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -55,7 +58,7 @@ class ReviewRating(models.Model):
     review = models.TextField(max_length=500, blank=True)
     rating = models.FloatField()
     ip = models.CharField(max_length=20, blank=True)
-    status = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 

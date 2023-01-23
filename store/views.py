@@ -58,7 +58,7 @@ def product_detail(request, category_slug, product_slug):
         is_ordered_previously = None
 
     # Get user reviews of product
-    reviews = ReviewRating.objects.filter(product=product, status=True)
+    reviews = ReviewRating.objects.filter(product=product, is_active=True)
 
     context = {
         "product": product,
