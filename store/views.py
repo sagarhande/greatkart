@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.contrib import messages
 
 # First party imports.
+from order.models import OrderProduct
 from category.models import Category
 from .models import Product, ReviewRating
 from cart.models import CartItem
@@ -50,10 +51,16 @@ def product_detail(request, category_slug, product_slug):
         product=product, cart__cart_id=get_or_create_session_key(request)
     ).exists()
 
+    try:
+        is_ordered_previously = OrderProduct.objects.filter(user__id = request.user.id, product=product, is_ordered=True).exists()            
+    except OrderProduct.DoesNotExist:
+        is_ordered_previously = None
+
     context = {
         "product": product,
         "is_added_to_cart": is_added_to_cart,
-        "product_variations": get_product_variations_data(product)
+        "product_variations": get_product_variations_data(product),
+        "is_ordered_previously": is_ordered_previously,
     }
 
     return render(request, "store/product_details.html", context=context)
@@ -94,7 +101,7 @@ def submit_review(request, product_id):
             form = ReviewForm(request.POST,instance=review)
             form.save()
             messages.success(request, "Thank you, your review has been updated!")
-            return  (url)
+            return  redirect(url)
         except ReviewRating.DoesNotExist:
             form = ReviewForm(request.POST)
             if form.is_valid():
@@ -110,5 +117,5 @@ def submit_review(request, product_id):
                 obj.save()
                 messages.success(request, "Thank you, your review has been submitted!")
 
-                return redirect(url)
+            return redirect(url)
 

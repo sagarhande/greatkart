@@ -163,6 +163,7 @@ def order_successful(request):
             'ordered_items': ordered_items,
             'sub_total': order.order_total - order.tax
         }
+        print("\nContext of successful Payment: ", context)
         return render(request, "orders/order_successful.html", context=context)
     except Exception as e:
         print(f"Exception occure while rendering order_successful.html\n Error: {e}")
