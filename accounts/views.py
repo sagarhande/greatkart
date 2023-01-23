@@ -14,6 +14,7 @@ from .services import send_activation_email, send_password_reset_email, merge_ca
 from cart.models import Cart, CartItem
 from common.services import get_session_key, get_or_create_session_key
 from store.models import Product
+from order.models import Order
 
 # Third party imports
 import requests
@@ -154,7 +155,13 @@ def activate(request, uidb64, token):
 
 @login_required(login_url="login")
 def dashboard(request):
-    return render(request, "accounts/dashboard.html")
+    orders = Order.objects.order_by('-created_at').filter(user__id=request.user.id, is_ordered=True)
+
+    context = {
+    "orders_count": orders.count()
+    }
+    
+    return render(request, "accounts/dashboard.html", context=context)
 
 
 def forgot_password(request):

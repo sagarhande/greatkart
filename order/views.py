@@ -147,8 +147,6 @@ def payments(request):
         return JsonResponse({"Error": f"{e}"})
 
 
-
-
 def order_successful(request):
     try:
         order_number = request.GET.get("order_number")
