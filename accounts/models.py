@@ -94,7 +94,7 @@ class AccountProfile(models.Model):
     country = models.CharField(blank=True, max_length=50)
 
     def __str__(self) -> str:
-        return self.user
+        return str(self.user.email)
 
     def full_address(self):
         return f"{self.address_line1}, {self.address_line2}"
