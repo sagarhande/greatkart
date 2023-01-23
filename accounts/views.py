@@ -155,12 +155,12 @@ def activate(request, uidb64, token):
 
 @login_required(login_url="login")
 def dashboard(request):
-    orders = Order.objects.order_by('-created_at').filter(user__id=request.user.id, is_ordered=True)
+    orders = Order.objects.order_by("-created_at").filter(
+        user__id=request.user.id, is_ordered=True
+    )
 
-    context = {
-    "orders_count": orders.count()
-    }
-    
+    context = {"orders_count": orders.count()}
+
     return render(request, "accounts/dashboard.html", context=context)
 
 
@@ -232,3 +232,14 @@ def reset_password(request):
         messages.success(request, "Password reseted successfully, please login now.")
         return redirect("login")
     return render(request, "accounts/reset_password.html")
+
+
+def my_orders(request):
+    orders = Order.objects.order_by("-created_at").filter(
+        user__id=request.user.id, is_ordered=True
+    )
+    context = {
+        "my_orders": orders,
+        "orders_count": len(orders),
+    }
+    return render(request, "accounts/my_orders.html", context=context)
