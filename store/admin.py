@@ -13,7 +13,7 @@ class ReviewRatingInline(admin.TabularInline):
     model = ReviewRating
     extra = 0
     readonly_fields = ('product', 'user', )
-    fields = ('rating', 'user', 'subject', 'status')
+    fields = ('rating', 'user', 'subject', 'is_active')
 
 
 
@@ -30,8 +30,8 @@ class VariationAdmin(admin.ModelAdmin):
     list_filter = ('product','variation_category', 'variation_value')
             
 class ReviewRatingAdmin(admin.ModelAdmin):
-     list_display = ('product', 'rating', 'user', 'subject', 'status', 'created_at')
-     list_editable = ('rating', 'subject', 'status')
+     list_display = ('product', 'rating', 'user', 'subject', 'is_active', 'created_at')
+     list_editable = ('rating', 'subject', 'is_active')
 
 admin.site.register(Product, AdminProduct)
 admin.site.register(Variation, VariationAdmin)

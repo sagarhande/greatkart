@@ -3,6 +3,8 @@
 # Django imports.
 from django.db import models
 from django.urls import reverse
+from django.db.models import Avg, Count
+
 # First party imports.
 from category.models import Category
 from .managers import *
@@ -27,6 +29,20 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def average_rating(self):
+        reviews = ReviewRating.objects.filter(product=self, is_active=True).aggregate(average=Avg('rating'))
+        avg = 0
+        if reviews['average']:
+            avg = float(reviews['average'])
+        return avg
+    
+    def review_count(self):
+        reviews = ReviewRating.objects.filter(product=self, is_active=True).aggregate(count=Count('id'))
+        count = 0
+        if reviews['count']:
+            count = float(reviews['count'])
+        return int(count)
 
 
 class Variation(models.Model):
@@ -47,6 +63,7 @@ class Variation(models.Model):
 
     def __str__(self) -> str:
         return self.variation_category + " : "+ self.variation_value
+    
 
 class ReviewRating(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -55,7 +72,7 @@ class ReviewRating(models.Model):
     review = models.TextField(max_length=500, blank=True)
     rating = models.FloatField()
     ip = models.CharField(max_length=20, blank=True)
-    status = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
