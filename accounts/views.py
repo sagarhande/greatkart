@@ -40,7 +40,14 @@ def register(request):
                 phone_number=phone_number,
                 password=password,
             )
+            # User Profile creation
+            profile = AccountProfile(
+                user=user,
+                profile_picture="default/default-user.png",
+            )
+            profile.save()
 
+            # Account activation
             is_email_sent = send_activation_email(request, user, email)
             if is_email_sent:
                 return redirect(f"accounts/login/?command=verification&email={email}")
