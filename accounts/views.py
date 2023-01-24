@@ -275,3 +275,37 @@ def edit_profile(request):
         "account_profile": account_profile,
     }
     return render(request, "accounts/edit_profile.html", context=context)
+
+
+def change_password(request):
+
+    if request.method == "POST":
+        current_password = request.POST.get("current_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        try:
+            user = Account.objects.get(id=request.user.id)
+
+            if new_password != confirm_password or not user.check_password(
+                current_password
+            ):
+
+                messages.error(request, "passwords does not match!")
+                return redirect("change-password")
+
+            # Set new password
+            user.set_password(new_password)
+            user.save()
+            messages.success(
+                request, "Password changed successfully, please login now."
+            )
+            return redirect("dashboard")
+
+        except Account.DoesNotExist:
+            messages.error(request, "User does not exist.")
+
+    return render(
+        request,
+        "accounts/change_password.html",
+    )
