@@ -241,6 +241,7 @@ def reset_password(request):
     return render(request, "accounts/reset_password.html")
 
 
+@login_required(login_url="login")
 def my_orders(request):
     orders = Order.objects.order_by("-created_at").filter(
         user__id=request.user.id, is_ordered=True
@@ -252,6 +253,7 @@ def my_orders(request):
     return render(request, "accounts/my_orders.html", context=context)
 
 
+@login_required(login_url="login")
 def edit_profile(request):
     account_profile = get_object_or_404(AccountProfile, user=request.user)
     if request.method == "POST":
@@ -277,6 +279,7 @@ def edit_profile(request):
     return render(request, "accounts/edit_profile.html", context=context)
 
 
+@login_required(login_url="login")
 def change_password(request):
 
     if request.method == "POST":
@@ -287,20 +290,22 @@ def change_password(request):
         try:
             user = Account.objects.get(id=request.user.id)
 
-            if new_password != confirm_password or not user.check_password(
-                current_password
-            ):
-
+            if new_password != confirm_password:
                 messages.error(request, "passwords does not match!")
                 return redirect("change-password")
 
-            # Set new password
-            user.set_password(new_password)
-            user.save()
-            messages.success(
-                request, "Password changed successfully, please login now."
-            )
-            return redirect("dashboard")
+            if user.check_password(current_password):
+                # Set new password
+                user.set_password(new_password)
+                user.save()
+                messages.success(
+                    request, "Password changed successfully, please login now."
+                )
+                return redirect("dashboard")
+
+            else:
+                messages.error(request, "wrong current password!")
+                return redirect("change-password")
 
         except Account.DoesNotExist:
             messages.error(request, "User does not exist.")
