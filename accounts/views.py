@@ -291,7 +291,13 @@ def change_password(request):
             user = Account.objects.get(id=request.user.id)
 
             if new_password != confirm_password:
-                messages.error(request, "passwords does not match!")
+                messages.error(request, "passwords does not match")
+                return redirect("change-password")
+
+            if current_password == new_password:
+                messages.error(
+                    request, "New password should not be same as current password"
+                )
                 return redirect("change-password")
 
             if user.check_password(current_password):
@@ -299,16 +305,16 @@ def change_password(request):
                 user.set_password(new_password)
                 user.save()
                 messages.success(
-                    request, "Password changed successfully, please login now."
+                    request, "Password changed successfully, please login now"
                 )
                 return redirect("dashboard")
 
             else:
-                messages.error(request, "wrong current password!")
+                messages.error(request, "wrong current password")
                 return redirect("change-password")
 
         except Account.DoesNotExist:
-            messages.error(request, "User does not exist.")
+            messages.error(request, "User does not exist")
 
     return render(
         request,
