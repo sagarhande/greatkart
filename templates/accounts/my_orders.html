@@ -34,7 +34,7 @@
                             <tbody>
                              {% for order in my_orders %}
                               <tr>
-                                <td>{{ order.order_number }}</td>
+                                <td>  <a href="{% url 'order-details' order.order_number %}">#{{ order.order_number }}</a></td>
                                 <td>{{ order.full_name }}</td>
                                 <td>{{ order.updated_at }}</td>
                                 <td>{{ order.order_total }}</td>
