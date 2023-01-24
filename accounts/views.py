@@ -1,15 +1,15 @@
 # Standard library imports.
 
 # Django imports.
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 
 # First party imports.
-from .forms import RegistrationForm
-from .models import Account
+from .forms import RegistrationForm, AccountForm, AccountProfileForm
+from .models import Account, AccountProfile
 from .services import send_activation_email, send_password_reset_email, merge_cart_items
 from cart.models import Cart, CartItem
 from common.services import get_session_key, get_or_create_session_key
@@ -246,4 +246,25 @@ def my_orders(request):
 
 
 def edit_profile(request):
-    return render(request, "accounts/edit_profile.html")
+    account_profile = get_object_or_404(AccountProfile, user=request.user)
+    if request.method == "POST":
+        account_form = AccountForm(request.POST, instance=request.user)
+        profile_form = AccountProfileForm(
+            request.POST, request.FILES, instance=account_profile
+        )
+
+        if account_form.is_valid() and profile_form.is_valid():
+            account_form.save()
+            profile_form.save()
+            messages.success(request, "Your profile has been updated.")
+            return redirect("edit-profile")
+    else:
+        account_form = AccountForm(instance=request.user)
+        profile_form = AccountProfileForm(instance=account_profile)
+
+    context = {
+        "account_form": account_form,
+        "profile_form": profile_form,
+        "account_profile": account_profile,
+    }
+    return render(request, "accounts/edit_profile.html", context=context)

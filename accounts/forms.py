@@ -47,8 +47,19 @@ class AccountForm(forms.ModelForm):
         model = Account
         fields = ("first_name", "last_name", "phone_number")
 
+    def __init__(self, *args, **kwargs):
+        super(AccountForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs["class"] = "form-control"
+
 
 class AccountProfileForm(forms.ModelForm):
+    profile_picture = forms.ImageField(
+        required=False,
+        error_messages={"invalid": "image files only"},
+        widget=forms.FileInput,
+    )
+
     class Meta:
         model = AccountProfile
         fields = (
@@ -59,3 +70,8 @@ class AccountProfileForm(forms.ModelForm):
             "state",
             "country",
         )
+
+    def __init__(self, *args, **kwargs):
+        super(AccountProfileForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs["class"] = "form-control"

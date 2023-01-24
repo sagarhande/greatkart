@@ -41,6 +41,7 @@ class AccountProfileAdmin(admin.ModelAdmin):
 
     thumbnail.short_description = "Profile Picture"
     list_display = ("thumbnail", "user", "city", "state", "country")
+    list_display_links = ("user", "thumbnail")
 
 
 admin.site.register(Account, AccountAdmin)
