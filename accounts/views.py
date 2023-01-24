@@ -166,7 +166,16 @@ def dashboard(request):
         user__id=request.user.id, is_ordered=True
     )
 
-    context = {"orders_count": orders.count()}
+    try:
+        account_profile = AccountProfile.objects.get(user=request.user)
+        account_profile_picture = account_profile.profile_picture.url
+    except AccountProfile.DoesNotExist:
+        account_profile_picture = "./images/avatars/avatar1.png"
+
+    context = {
+        "orders_count": orders.count(),
+        "account_profile_picture": account_profile_picture,
+    }
 
     return render(request, "accounts/dashboard.html", context=context)
 
