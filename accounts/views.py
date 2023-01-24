@@ -1,19 +1,20 @@
 # Standard library imports.
 
 # Django imports.
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 
 # First party imports.
-from .forms import RegistrationForm
-from .models import Account
+from .forms import RegistrationForm, AccountForm, AccountProfileForm
+from .models import Account, AccountProfile
 from .services import send_activation_email, send_password_reset_email, merge_cart_items
 from cart.models import Cart, CartItem
 from common.services import get_session_key, get_or_create_session_key
 from store.models import Product
+from order.models import Order
 
 # Third party imports
 import requests
@@ -39,7 +40,14 @@ def register(request):
                 phone_number=phone_number,
                 password=password,
             )
+            # User Profile creation
+            profile = AccountProfile(
+                user=user,
+                profile_picture="default/default-user.png",
+            )
+            profile.save()
 
+            # Account activation
             is_email_sent = send_activation_email(request, user, email)
             if is_email_sent:
                 return redirect(f"accounts/login/?command=verification&email={email}")
@@ -109,8 +117,8 @@ def login(request):
                 if query:
                     params = dict(x.split("=") for x in query.split("&"))
                     if "next" in params:
-                        next_page = "cart"
-                        # next_page = params["next"]
+                        # next_page = "cart"
+                        next_page = params["next"]
 
                 return redirect(next_page)
 
@@ -154,7 +162,22 @@ def activate(request, uidb64, token):
 
 @login_required(login_url="login")
 def dashboard(request):
-    return render(request, "accounts/dashboard.html")
+    orders = Order.objects.order_by("-created_at").filter(
+        user__id=request.user.id, is_ordered=True
+    )
+
+    try:
+        account_profile = AccountProfile.objects.get(user=request.user)
+        account_profile_picture = account_profile.profile_picture.url
+    except AccountProfile.DoesNotExist:
+        account_profile_picture = "./images/avatars/avatar1.png"
+
+    context = {
+        "orders_count": orders.count(),
+        "account_profile_picture": account_profile_picture,
+    }
+
+    return render(request, "accounts/dashboard.html", context=context)
 
 
 def forgot_password(request):
@@ -225,3 +248,84 @@ def reset_password(request):
         messages.success(request, "Password reseted successfully, please login now.")
         return redirect("login")
     return render(request, "accounts/reset_password.html")
+
+
+@login_required(login_url="login")
+def my_orders(request):
+    orders = Order.objects.order_by("-created_at").filter(
+        user__id=request.user.id, is_ordered=True
+    )
+    context = {
+        "my_orders": orders,
+        "orders_count": len(orders),
+    }
+    return render(request, "accounts/my_orders.html", context=context)
+
+
+@login_required(login_url="login")
+def edit_profile(request):
+    account_profile = get_object_or_404(AccountProfile, user=request.user)
+    if request.method == "POST":
+        account_form = AccountForm(request.POST, instance=request.user)
+        profile_form = AccountProfileForm(
+            request.POST, request.FILES, instance=account_profile
+        )
+
+        if account_form.is_valid() and profile_form.is_valid():
+            account_form.save()
+            profile_form.save()
+            messages.success(request, "Your profile has been updated.")
+            return redirect("edit-profile")
+    else:
+        account_form = AccountForm(instance=request.user)
+        profile_form = AccountProfileForm(instance=account_profile)
+
+    context = {
+        "account_form": account_form,
+        "profile_form": profile_form,
+        "account_profile": account_profile,
+    }
+    return render(request, "accounts/edit_profile.html", context=context)
+
+
+@login_required(login_url="login")
+def change_password(request):
+
+    if request.method == "POST":
+        current_password = request.POST.get("current_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        try:
+            user = Account.objects.get(id=request.user.id)
+
+            if new_password != confirm_password:
+                messages.error(request, "passwords does not match")
+                return redirect("change-password")
+
+            if current_password == new_password:
+                messages.error(
+                    request, "New password should not be same as current password"
+                )
+                return redirect("change-password")
+
+            if user.check_password(current_password):
+                # Set new password
+                user.set_password(new_password)
+                user.save()
+                messages.success(
+                    request, "Password changed successfully, please login now"
+                )
+                return redirect("dashboard")
+
+            else:
+                messages.error(request, "wrong current password")
+                return redirect("change-password")
+
+        except Account.DoesNotExist:
+            messages.error(request, "User does not exist")
+
+    return render(
+        request,
+        "accounts/change_password.html",
+    )
