@@ -117,8 +117,8 @@ def login(request):
                 if query:
                     params = dict(x.split("=") for x in query.split("&"))
                     if "next" in params:
-                        next_page = "cart"
-                        # next_page = params["next"]
+                        # next_page = "cart"
+                        next_page = params["next"]
 
                 return redirect(next_page)
 
