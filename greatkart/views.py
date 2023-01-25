@@ -13,5 +13,5 @@ def home(request):
     products = Product.objects.all().filter(is_available=True)
     context = {
         "products": products,
-        }
-    return render(request, template_name='home.html', context=context)
+    }
+    return render(request, template_name="home.html", context=context)
