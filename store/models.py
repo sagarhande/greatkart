@@ -92,3 +92,7 @@ class ProductGallery(models.Model):
 
     def __str__(self) -> str:
         return self.product.name
+
+    class Meta:
+        verbose_name = "Product Gallery"
+        verbose_name_plural = "Product Gallery"

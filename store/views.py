@@ -9,11 +9,12 @@ from django.contrib import messages
 # First party imports.
 from order.models import OrderProduct
 from category.models import Category
-from .models import Product, ReviewRating
+from .models import Product, ReviewRating, ProductGallery
 from cart.models import CartItem
 from .forms import ReviewForm
 from common.services import get_or_create_session_key
 from .services import get_product_variations_data
+
 
 def store(request, category_slug=None):
 
@@ -45,15 +46,18 @@ def store(request, category_slug=None):
 def product_detail(request, category_slug, product_slug):
     category = get_object_or_404(Category, slug=category_slug)
     product = get_object_or_404(Product, slug=product_slug, category=category)
+    product_gallery = ProductGallery.objects.filter(product=product)
 
     # Check if product is added to the cart
     is_added_to_cart = CartItem.objects.filter(
         product=product, cart__cart_id=get_or_create_session_key(request)
     ).exists()
-    
+
     # Check if current user has ordered product previously
     try:
-        is_ordered_previously = OrderProduct.objects.filter(user__id = request.user.id, product=product, is_ordered=True).exists()            
+        is_ordered_previously = OrderProduct.objects.filter(
+            user__id=request.user.id, product=product, is_ordered=True
+        ).exists()
     except OrderProduct.DoesNotExist:
         is_ordered_previously = None
 
@@ -68,6 +72,7 @@ def product_detail(request, category_slug, product_slug):
         "reviews": reviews,
         "average_rating": product.average_rating(),
         "review_count": product.review_count(),
+        "product_gallery": product_gallery,
     }
 
     return render(request, "store/product_details.html", context=context)
@@ -83,8 +88,12 @@ def search(request):
         Product.objects.all()
         .order_by("-created_date")
         .select_related("category")
-        .filter(Q(name__icontains=keyword) | Q(category__name__icontains=keyword) |
-                Q(description__icontains=keyword) | Q(category__description__icontains=keyword))
+        .filter(
+            Q(name__icontains=keyword)
+            | Q(category__name__icontains=keyword)
+            | Q(description__icontains=keyword)
+            | Q(category__description__icontains=keyword)
+        )
     )
 
     # Set paginator
@@ -101,28 +110,29 @@ def search(request):
 
 
 def submit_review(request, product_id):
-    url = request.META.get('HTTP_REFERER')
+    url = request.META.get("HTTP_REFERER")
     if request.method == "POST":
         try:
-            review = ReviewRating.objects.get(user__id=request.user.id, product__id=product_id)
-            form = ReviewForm(request.POST,instance=review)
+            review = ReviewRating.objects.get(
+                user__id=request.user.id, product__id=product_id
+            )
+            form = ReviewForm(request.POST, instance=review)
             form.save()
             messages.success(request, "Thank you, your review has been updated!")
-            return  redirect(url)
+            return redirect(url)
         except ReviewRating.DoesNotExist:
             form = ReviewForm(request.POST)
             if form.is_valid():
                 obj = ReviewRating(
-                    subject = form.cleaned_data.get("subject"),
-                    rating = form.cleaned_data.get("rating"),
-                    review = form.cleaned_data.get("review"),
-                    ip = request.META.get('REMOTE_ADDR'),
-                    product_id = product_id,
-                    user = request.user,
+                    subject=form.cleaned_data.get("subject"),
+                    rating=form.cleaned_data.get("rating"),
+                    review=form.cleaned_data.get("review"),
+                    ip=request.META.get("REMOTE_ADDR"),
+                    product_id=product_id,
+                    user=request.user,
                 )
 
                 obj.save()
                 messages.success(request, "Thank you, your review has been submitted!")
 
             return redirect(url)
-
